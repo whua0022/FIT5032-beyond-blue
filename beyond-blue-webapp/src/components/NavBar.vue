@@ -14,7 +14,7 @@
                 <RouterLink class="nav-link" to="/">Home</RouterLink>
             </li>
             <li class="nav-item">
-                <RouterLink class="nav-link" to="/">Events</RouterLink>
+                <RouterLink class="nav-link" to="/events">Events</RouterLink>
             </li>
             <li class="nav-item">
                 <RouterLink class="nav-link" to="/">Resources</RouterLink>
