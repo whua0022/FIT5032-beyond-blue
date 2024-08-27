@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router';
 
 const data = ref({
   username: '',
@@ -23,9 +24,10 @@ const submitForm = () => {
   validatePassword(true)
   validateConfirmPassword(true)
   if (!errors.value.username && !errors.value.password && !errors.value.confirmPassword) {
-    //submittedCards.value.push({ ...data.value })
     clearForm()
   }
+  const router = useRouter()
+  router.push('/')
 }
 
 const clearForm = () => {
@@ -129,7 +131,7 @@ const validateAdminCode = (blur) => {
           <div v-if="errors.adminCode" class="text-danger">{{ errors.adminCode }}</div>
         </div>
         <div class="d-grid">
-          <button type="submit" class="btn btn-primary" :disabled="passwordError">Create account</button>
+          <button type="submit" class="btn btn-primary" :disabled="accountError">Create account</button>
         </div>
       </form>
     </div>

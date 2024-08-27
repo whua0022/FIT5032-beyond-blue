@@ -7,12 +7,14 @@ import HomeView from './pages/HomeView.vue';
 import LoginView from './pages/LoginView.vue';
 import RegisterAccView from './pages/RegisterAccView.vue';
 import EventsView from './pages/EventsView.vue';
+import CreateEventView from './pages/CreateEventView.vue';
 
 export const routes = [
     {path: "/", component: HomeView},
     {path: "/login", component: LoginView},
     {path: "/register", component: RegisterAccView},
-    {path: "/events", component: EventsView}
+    {path: "/events", component: EventsView},
+    {path: "/events/create", component: CreateEventView}
 ]
 
 export const router = createRouter({
