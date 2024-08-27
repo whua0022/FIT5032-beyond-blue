@@ -14,14 +14,13 @@ const errors = ref({
   email: null,
   confirmPassword: null
 })
-const submittedCards = ref([])
 
 const submitForm = () => {
   validateName(true)
   validatePassword(true)
   validateConfirmPassword(true)
   if (!errors.value.username && !errors.value.password && !errors.value.confirmPassword) {
-    submittedCards.value.push({ ...data.value })
+    //submittedCards.value.push({ ...data.value })
     clearForm()
   }
 }
@@ -73,6 +72,15 @@ const validateConfirmPassword = (blur) => {
     errors.value.confirmPassword = null
   }
 }
+
+const validateEmail = (blur) => {
+  if (data.value.email.length < 6) {
+    if (blur) errors.value.email = 'Email is incorrect format'
+  } else {
+    errors.value.email = null
+  }
+}
+
 </script>
 
 <template>
@@ -81,25 +89,22 @@ const validateConfirmPassword = (blur) => {
         <div class="mb-3">
           <label for="usernameInput" class="form-label">Username</label>
           <input type="text" class="form-control" id="usernameInput"  @blur="() => validateName(true)" @input="() => validateName(false)" v-model="data.username" required>
+          <div v-if="errors.username" class="text-danger">{{ errors.username }}</div>
         </div>
         <div class="mb-3">
           <label for="emailInput" class="form-label">Email address</label>
-          <input type="email" class="form-control" id="emailInput" v-model="data.email" required>
-          <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+          <input type="email" class="form-control" id="emailInput" @blur="() => validateEmail(true)" @input="() => validateEmail(false)" v-model="data.email" required>
+          <div v-if="errors.email" class="text-danger">{{ errors.email }}</div>
         </div>
         <div class="mb-3">
           <label for="passwordInput" class="form-label">Password</label>
-          <input type="password" class="form-control" id="passwordInput" @blur="() => validatePassword(true)" @input="() => validatePassword(false)" v-model="data.password" @input="validatePassword" required>
-          <div v-if="passwordError" class="text-danger">
-            Password must be at least 8 characters long.
-          </div>
+          <input type="password" class="form-control" id="passwordInput" @blur="() => validatePassword(true)" @input="() => validatePassword(false)" v-model="data.password" required>
+          <div v-if="errors.password" class="text-danger">{{ errors.password }}</div>
         </div>
         <div class="mb-3">
-          <label for="confirmPasswordInput" class="form-label">Password</label>
-          <input type="password" class="form-control" id="confirmPasswordInput" v-model="data.confirmPassword" @input="validateConfirmPassword" required>
-          <div v-if="passwordError" class="text-danger">
-            Password must be at least 8 characters long.
-          </div>
+          <label for="confirmPasswordInput" class="form-label">Confirm password</label>
+          <input type="password" class="form-control" id="confirmPasswordInput" @blur="() => validateConfirmPassword(true)" @input="() => validateConfirmPassword(false)" v-model="data.confirmPassword" required>
+          <div v-if="errors.confirmPassword" class="text-danger">{{ errors.confirmPassword }}</div>
         </div>
         <div class="d-grid">
           <button type="submit" class="btn btn-primary" :disabled="passwordError">Create account</button>
