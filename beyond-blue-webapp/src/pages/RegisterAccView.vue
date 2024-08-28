@@ -1,4 +1,5 @@
 <script setup>
+import { currentUserStore } from '@/store';
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
 
@@ -23,11 +24,24 @@ const submitForm = () => {
   validateName(true)
   validatePassword(true)
   validateConfirmPassword(true)
-  if (!errors.value.username && !errors.value.password && !errors.value.confirmPassword) {
-    clearForm()
+  
+  // Add to local storage here
+  const users = JSON.parse(localStorage.getItem("users") || "[]")
+  const newUser = {
+    username: data.value.username,
+    password: data.value.password,
+    email: data.value.email,
+    isAdmin: data.value.isAdmin
   }
-  const router = useRouter()
-  router.push('/')
+  users.push(newUser)
+  localStorage.setItem("users", JSON.stringify(users))
+  currentUserStore.setCurrentUser(newUser.username, newUser.email, newUser.isAdmin)
+
+  // if (!errors.value.username && !errors.value.password && !errors.value.confirmPassword) {
+  //   clearForm()
+  // }
+  // const router = useRouter()
+  // router.push('/')
 }
 
 const clearForm = () => {
@@ -93,7 +107,6 @@ const validateAdminCode = (blur) => {
     errors.value.adminCode = null
   }
 }
-
 </script>
 
 <template>
