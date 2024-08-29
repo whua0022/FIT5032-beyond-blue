@@ -1,11 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 import { formatDate } from '@/lib'
-import { currentUserStore } from '@/store';
-let eventList = [
-  { id: 1, title: "Event 1", description: "Description for event 1", location: "1 Test street, Melbourne, 3000", date: new Date(2024, 8, 1), ratings:[{username: "Test user 1", score: 3, review: "Good fun"}]},
-  { id: 2, title: "Event 2", description: "Description for event 2", location: "2 Test street, Melbourne, 3000", date: new Date(2024, 10, 1), ratings:[{username: "Test user 1", score: 5, review: "The best"}, {username: "Test user 2", score: 4, review: "Awesome"}]},
-]
+import { currentUserStore } from '@/store'
+
+let eventList = JSON.parse(localStorage.getItem("events"))
 
 const selectedEvent = ref(null)
 
@@ -22,7 +20,6 @@ const bookEvent = () => {
 const unbookEvent = () => {
   //TODO: Fix
 }
-
 </script>
 
 
