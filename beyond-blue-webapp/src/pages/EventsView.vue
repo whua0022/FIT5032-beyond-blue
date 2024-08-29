@@ -14,6 +14,15 @@ const viewDetails = (event) => {
   selectedEvent.value = event
   new bootstrap.Modal(document.getElementById('eventModal')).show()
 }
+
+const bookEvent = () => {
+ 
+}
+
+const unbookEvent = () => {
+  //TODO: Fix
+}
+
 </script>
 
 
@@ -28,7 +37,12 @@ const viewDetails = (event) => {
           </div>
           <div class="list-group">
             <div v-for="event in eventList" :key="event.id" class="list-group-item mb-3">
-              <h5 class="mb-1">{{ event.title }}</h5>
+              <div>
+                <h5 class="mb-1">{{ event.title + " (BOOKED)" }}</h5>
+              </div>
+              <div>
+                <h5 class="mb-1">{{ event.title }}</h5>
+              </div>
               <p class="mb-1">{{ event.description }}</p>
               <button @click="viewDetails(event)" class="btn btn-primary">View Details</button>
             </div>
@@ -65,6 +79,12 @@ const viewDetails = (event) => {
             </ul>
           </div>
           <div class="modal-footer">
+            <div>
+              <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="unbookEvent(selectedEvent)">Unbook</button>
+            </div>
+            <div>
+              <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="bookEvent(selectedEvent)">Book</button>
+            </div>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>

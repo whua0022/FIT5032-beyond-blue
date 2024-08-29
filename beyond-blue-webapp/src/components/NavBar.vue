@@ -26,7 +26,12 @@ import { currentUserStore } from '@/store';
                 <RouterLink class="nav-link" to="/">Contact us</RouterLink>
             </li>
         </ul>
-        <RouterLink class="nav-link" to="/login">Login</RouterLink>
+        <div v-if="currentUserStore.username">
+          <p>{{ currentUserStore.username }}</p>
+        </div>
+        <div v-else>
+          <RouterLink class="nav-link" to="/login">Login</RouterLink>
+        </div>
         </div>
     </div>
     </nav>

@@ -14,7 +14,7 @@ export const routes = [
     {path: "/login", component: LoginView},
     {path: "/register", component: RegisterAccView},
     {path: "/events", component: EventsView},
-    {path: "/events/create", component: CreateEventView}
+    {path: "/events/create", component: CreateEventView},
 ]
 
 export const router = createRouter({

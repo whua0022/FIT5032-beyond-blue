@@ -2,6 +2,7 @@
 import { currentUserStore } from '@/store';
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
+import CryptoJS from 'crypto-js'
 
 const data = ref({
   username: '',
@@ -29,19 +30,18 @@ const submitForm = () => {
   const users = JSON.parse(localStorage.getItem("users") || "[]")
   const newUser = {
     username: data.value.username,
-    password: data.value.password,
+    password: CryptoJS.SHA256(data.value.password).toString(CryptoJS.enc.Hex),
     email: data.value.email,
     isAdmin: data.value.isAdmin
   }
   users.push(newUser)
   localStorage.setItem("users", JSON.stringify(users))
-  currentUserStore.setCurrentUser(newUser.username, newUser.email, newUser.isAdmin)
+  currentUserStore.setCurrentUser(newUser.username, newUser.email, newUser.isAdmin, [], [])
 
-  // if (!errors.value.username && !errors.value.password && !errors.value.confirmPassword) {
-  //   clearForm()
-  // }
-  // const router = useRouter()
-  // router.push('/')
+  if (!errors.value.username && !errors.value.password && !errors.value.confirmPassword) {
+    clearForm()
+  }
+  
 }
 
 const clearForm = () => {
@@ -51,6 +51,8 @@ const clearForm = () => {
     email: '',
     confirmPassword: ''
   }
+  const router = useRouter()
+  router.push('/')
 }
 
 const validateName = (blur) => {
