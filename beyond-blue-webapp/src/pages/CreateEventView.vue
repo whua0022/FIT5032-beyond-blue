@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
 const data = ref({
-    id: '',
     title: '',
     description: '',
     location: '',
@@ -20,7 +19,7 @@ const router = useRouter()
 
 const submitForm = () => {
   validateTitle(true)
-
+  validateDate(true)
   // Add to local storage here
   const events = JSON.parse(localStorage.getItem("events") || "[]")
   const newEvent = {
@@ -66,8 +65,9 @@ const validateDescription = (blur) => {
 
 const validateDate = (blur) => {
   const today = new Date()
+  const inputDate =new Date(data.value.date)
 
-  if (data.value.date <= today) {
+  if (inputDate <= today) {
     if (blur) errors.value.date = 'Date must be later than today'
   } else {
     errors.value.date = null
@@ -78,25 +78,25 @@ const validateDate = (blur) => {
 
 <template>
     <form @submit.prevent="submitForm" class="w-100 mx-auto form-container mt-5 p-5 border">
-        <div class="mb-3">
-            <label for="titleInput" class="form-label">Title</label>
-            <input type="text" class="form-control" id="titleInput"  @blur="() => validateTitle(true)" @input="() => validateTitle(false)" v-model="data.title" required>
-            <div v-if="errors.title" class="text-danger">{{ errors.username }}</div>
-        </div>
-        <div class="mb-3">
-            <label for="descriptionInput" class="form-label">Description</label>
-            <input type="text" class="form-control" id="descriptionInput" @blur="() => validateDescription(true)" @input="() => validateDescription(false)" v-model="data.description" required>
-        </div>
-        <div class="mb-3">
-            <label for="locationInput" class="form-label">Location</label>
-            <input type="text" class="form-control" id="locationInput"  v-model="data.location" required>
-        </div>
-        <div class="mb-3">
-            <label for="dateInput" class="form-label">Date</label>
-            <input type="date" class="form-control" id="dateInput" @blur="() => validateDate(true)" @input="() => validateDate(false)" v-model="data.date" required>
-        </div>
-        <div class="d-grid">
-          <button type="submit" class="btn btn-primary" :disabled="eventError">Create event</button>
-        </div>
-      </form>
+      <div class="mb-3">
+          <label for="titleInput" class="form-label">Title</label>
+          <input type="text" class="form-control" id="titleInput"  @blur="() => validateTitle(true)" @input="() => validateTitle(false)" v-model="data.title" required>
+          <div v-if="errors.title" class="text-danger">{{ errors.username }}</div>
+      </div>
+      <div class="mb-3">
+          <label for="descriptionInput" class="form-label">Description</label>
+          <input type="text" class="form-control" id="descriptionInput" @blur="() => validateDescription(true)" @input="() => validateDescription(false)" v-model="data.description" required>
+      </div>
+      <div class="mb-3">
+          <label for="locationInput" class="form-label">Location</label>
+          <input type="text" class="form-control" id="locationInput"  v-model="data.location" required>
+      </div>
+      <div class="mb-3">
+          <label for="dateInput" class="form-label">Date</label>
+          <input type="date" class="form-control" id="dateInput" @blur="() => validateDate(true)" @input="() => validateDate(false)" v-model="data.date" required>
+      </div>
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary" :disabled="eventError">Create event</button>
+      </div>
+    </form>
 </template>

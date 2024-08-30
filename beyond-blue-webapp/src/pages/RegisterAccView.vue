@@ -20,7 +20,7 @@ const errors = ref({
   confirmPassword: null,
   adminCode: null
 })
-
+const router = useRouter()
 const submitForm = () => {
   validateName(true)
   validatePassword(true)
@@ -41,7 +41,7 @@ const submitForm = () => {
   if (!errors.value.username && !errors.value.password && !errors.value.confirmPassword) {
     clearForm()
   }
-  
+  router.push('/')
 }
 
 const clearForm = () => {
@@ -51,8 +51,6 @@ const clearForm = () => {
     email: '',
     confirmPassword: ''
   }
-  const router = useRouter()
-  router.push('/')
 }
 
 const validateName = (blur) => {

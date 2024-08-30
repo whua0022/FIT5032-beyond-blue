@@ -9,24 +9,39 @@ const data = ref({
     password: ''
 })
 
-
+const errors = ref({
+    loginError: null
+})
 const router = useRouter()
 
 // Find a valid account
 const users = JSON.parse(localStorage.getItem("users"))
+
+let userFound = false
 const login = () => {
     users.forEach(user => {
         if (user.email == data.value.email && user.password == CryptoJS.SHA256(data.value.password).toString(CryptoJS.enc.Hex)) {
             currentUserStore.setCurrentUser(user.username, user.email, user.isAdmin, user.createdEvents, user.bookedEvents)
+            userFound = true
         }
     })
-    router.push('/')
+    if (userFound) {
+        router.push('/')
+    } else {
+        data.value = {
+            email: '',
+            password: ''
+        }
+        errors.value.loginError = true
+    }
+    
 }
 
 </script>
 <template>
     <div>
         <form @submit.prevent="login" class="w-100 mx-auto form-container mt-5 p-5 border">
+            <div v-if="errors.loginError" class="text-danger">Incorrect details</div>
             <div class="mb-3">
                 <label for="emailInput" class="form-label">Email address</label>
                 <input type="email" class="form-control" id="emailInput" aria-describedby="EmailHelp" v-model="data.email">

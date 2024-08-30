@@ -6,6 +6,7 @@ import { currentUserStore } from '@/store';
 const route = useRoute()
 const eventId = route.query.eventId
 const title = route.query.eventTitle
+const router = useRouter()
 
 const data = ref({
     rating: '',
@@ -23,6 +24,7 @@ const clearForm = () => {
     rating: '',
     review: ''
   }
+    router.push('/events')
 }
 
 const submitForm = () => {
@@ -39,8 +41,6 @@ const submitForm = () => {
     if (!errors.value.username) {
         clearForm()
     }
-    const router = useRouter()
-    router.push('/events')
 }
 
 const validateRating = (blur) => {

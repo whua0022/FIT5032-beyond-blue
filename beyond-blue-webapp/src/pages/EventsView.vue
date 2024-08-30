@@ -25,6 +25,15 @@ const bookEvent = () => {
 const unbookEvent = () => {
   //TODO: Fix
 }
+
+const displayAverageRating = (event) => {
+  let score = 0
+  event.reviews.forEach(review => {
+    score += review.rating
+  });
+  return Math.floor(score/event.reviews.length)
+}
+
 </script>
 
 
@@ -40,7 +49,8 @@ const unbookEvent = () => {
           <div class="list-group">
             <div v-for="event in eventList" :key="event.id" class="list-group-item mb-3">
               <div>
-                <h5 class="mb-1">{{ event.title + " (BOOKED)" }}</h5>
+                <!-- <h5 class="mb-1">{{ event.title + " (BOOKED)" }}</h5> -->
+                <span class="badge bg-primary rounded-pill">{{ displayAverageRating(event) }}/5</span>
               </div>
               <div>
                 <h5 class="mb-1">{{ event.title }}</h5>
@@ -64,8 +74,8 @@ const unbookEvent = () => {
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="eventModalLabel">{{ selectedEvent?.title }}</h5>
-            <div v-if="currentUserStore.username != null">
-              <RouterLink class="btn" :to="{name: 'AddRatingView', query:{eventId: selectedEvent?.id, eventTitle: selectedEvent?.title}}" @click="hideModal">Rate</RouterLink>
+            <div v-if="currentUserStore.username != null" class="ms-auto">
+              <RouterLink class="btn btn-primary" :to="{name: 'AddRatingView', query:{eventId: selectedEvent?.id, eventTitle: selectedEvent?.title}}" @click="hideModal">Rate</RouterLink>
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
@@ -86,10 +96,10 @@ const unbookEvent = () => {
           </div>
           <div class="modal-footer">
             <div>
-              <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="unbookEvent(selectedEvent)">Unbook</button>
+              <!-- <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="unbookEvent(selectedEvent)">Unbook</button> -->
             </div>
             <div>
-              <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="bookEvent(selectedEvent)">Book</button>
+              <!-- <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="bookEvent(selectedEvent)">Book</button> -->
             </div>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
