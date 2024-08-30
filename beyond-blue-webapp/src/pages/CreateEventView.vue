@@ -56,6 +56,24 @@ const validateTitle = (blur) => {
   }
 }
 
+const validateDescription = (blur) => {
+  if (data.value.description.length < 1) {
+    if (blur) errors.value.description = 'Description must not be empty'
+  } else {
+    errors.value.description = null
+  }
+}
+
+const validateDate = (blur) => {
+  const today = new Date()
+
+  if (data.value.date <= today) {
+    if (blur) errors.value.date = 'Date must be later than today'
+  } else {
+    errors.value.date = null
+  }
+}
+
 </script>
 
 <template>
@@ -67,7 +85,7 @@ const validateTitle = (blur) => {
         </div>
         <div class="mb-3">
             <label for="descriptionInput" class="form-label">Description</label>
-            <input type="text" class="form-control" id="descriptionInput" v-model="data.description" required>
+            <input type="text" class="form-control" id="descriptionInput" @blur="() => validateDescription(true)" @input="() => validateDescription(false)" v-model="data.description" required>
         </div>
         <div class="mb-3">
             <label for="locationInput" class="form-label">Location</label>
@@ -75,7 +93,7 @@ const validateTitle = (blur) => {
         </div>
         <div class="mb-3">
             <label for="dateInput" class="form-label">Date</label>
-            <input type="date" class="form-control" id="dateInput"  v-model="data.date" required>
+            <input type="date" class="form-control" id="dateInput" @blur="() => validateDate(true)" @input="() => validateDate(false)" v-model="data.date" required>
         </div>
         <div class="d-grid">
           <button type="submit" class="btn btn-primary" :disabled="eventError">Create event</button>

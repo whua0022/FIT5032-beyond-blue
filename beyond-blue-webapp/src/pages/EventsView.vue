@@ -13,6 +13,11 @@ const viewDetails = (event) => {
   new bootstrap.Modal(document.getElementById('eventModal')).show()
 }
 
+const hideModal = () => {
+  const modalElement = document.getElementById('eventModal')
+  const modal = bootstrap.Modal.getInstance(modalElement)
+  modal.hide()
+}
 const bookEvent = () => {
  
 }
@@ -59,19 +64,23 @@ const unbookEvent = () => {
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="eventModalLabel">{{ selectedEvent?.title }}</h5>
+            <div v-if="currentUserStore.username != null">
+              <RouterLink class="btn" :to="{name: 'AddRatingView', query:{eventId: selectedEvent?.id, eventTitle: selectedEvent?.title}}" @click="hideModal">Rate</RouterLink>
+            </div>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <p><strong>Description:</strong> {{ selectedEvent?.description }}</p>
-            <p><strong>Date:</strong> {{ formatDate(selectedEvent?.date) }}</p>
+            <p><strong>Date:</strong> {{ selectedEvent?.date }}</p>
             <p><strong>Location:</strong> {{ selectedEvent?.location }}</p>
             <p><strong>Reviews</strong></p>
-            <ul>
-              <li v-for="rating in selectedEvent?.ratings" :key="rating.username">
-                <strong>{{ rating.username }}</strong> 
-                <span>{{ rating.score }}/5</span>
-                <p><strong>Reviews</strong></p>
-                <p>{{ rating.review }}</p>
+            <ul class="list-group">
+              <li v-for="review in selectedEvent?.reviews" :key="review.username" class="list-group-item mb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>{{ review.username }}</strong>
+                  <span class="badge bg-primary rounded-pill">{{ review.rating }}/5</span>
+                </div>
+                <p class="mb-1">{{ review.review }}</p>
               </li>
             </ul>
           </div>
