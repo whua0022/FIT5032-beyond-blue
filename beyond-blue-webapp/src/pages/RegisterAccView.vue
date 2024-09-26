@@ -2,10 +2,10 @@
 import { currentUserStore } from '@/store';
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
-import CryptoJS from 'crypto-js'
+import {getAuth, createUserWithEmailAndPassword} from "firebase/auth"
+
 
 const data = ref({
-  username: '',
   password: '',
   email: '',
   confirmPassword: '',
@@ -14,31 +14,18 @@ const data = ref({
 })
 
 const errors = ref({
-  username: null,
   password: null,
   email: null,
   confirmPassword: null,
   adminCode: null
 })
 const router = useRouter()
+
 const submitForm = () => {
-  validateName(true)
   validatePassword(true)
   validateConfirmPassword(true)
-  
-  // Add to local storage here
-  const users = JSON.parse(localStorage.getItem("users") || "[]")
-  const newUser = {
-    username: data.value.username,
-    password: CryptoJS.SHA256(data.value.password).toString(CryptoJS.enc.Hex),
-    email: data.value.email,
-    isAdmin: data.value.isAdmin
-  }
-  users.push(newUser)
-  localStorage.setItem("users", JSON.stringify(users))
-  currentUserStore.setCurrentUser(newUser.username, newUser.email, newUser.isAdmin, [], [])
-
-  if (!errors.value.username && !errors.value.password && !errors.value.confirmPassword) {
+  register()
+  if (!errors.value.password && !errors.value.confirmPassword) {
     clearForm()
   }
   router.push('/')
@@ -46,18 +33,9 @@ const submitForm = () => {
 
 const clearForm = () => {
   data.value = {
-    username: '',
     password: '',
     email: '',
     confirmPassword: ''
-  }
-}
-
-const validateName = (blur) => {
-  if (data.value.username.length < 3) {
-    if (blur) errors.value.username = 'Username must be at least 3 characters'
-  } else {
-    errors.value.username = null
   }
 }
 
@@ -107,16 +85,22 @@ const validateAdminCode = (blur) => {
     errors.value.adminCode = null
   }
 }
+
+const auth = getAuth()
+const register = () => {
+  createUserWithEmailAndPassword(auth, data.value.email, data.value.password)
+    .then(() => {
+      window.alert("Registration success")
+      router.push("/login")
+    }).catch(() => {
+      window.alert("Registration failed")
+    })
+}
 </script>
 
 <template>
     <div>
       <form @submit.prevent="submitForm" class="w-100 mx-auto form-container mt-5 p-5 border">
-        <div class="mb-3">
-          <label for="usernameInput" class="form-label">Username</label>
-          <input type="text" class="form-control" id="usernameInput"  @blur="() => validateName(true)" @input="() => validateName(false)" v-model="data.username" required>
-          <div v-if="errors.username" class="text-danger">{{ errors.username }}</div>
-        </div>
         <div class="mb-3">
           <label for="emailInput" class="form-label">Email address</label>
           <input type="email" class="form-control" id="emailInput" @blur="() => validateEmail(true)" @input="() => validateEmail(false)" v-model="data.email" required>

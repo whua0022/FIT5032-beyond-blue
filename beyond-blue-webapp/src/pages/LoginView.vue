@@ -2,7 +2,7 @@
 import { currentUserStore } from '@/store';
 import { useRouter } from 'vue-router';
 import {ref} from 'vue'
-import CryptoJS from 'crypto-js'
+import {getAuth, signInWithEmailAndPassword} from "firebase/auth"
 
 const data = ref({
     email: '',
@@ -13,28 +13,20 @@ const errors = ref({
     loginError: null
 })
 const router = useRouter()
-
-// Find a valid account
-const users = JSON.parse(localStorage.getItem("users"))
-
-let userFound = false
 const login = () => {
-    users.forEach(user => {
-        if (user.email == data.value.email && user.password == CryptoJS.SHA256(data.value.password).toString(CryptoJS.enc.Hex)) {
-            currentUserStore.setCurrentUser(user.username, user.email, user.isAdmin, user.createdEvents, user.bookedEvents)
-            userFound = true
-        }
-    })
-    if (userFound) {
-        router.push('/')
-    } else {
-        data.value = {
-            email: '',
-            password: ''
-        }
-        errors.value.loginError = true
-    }
-    
+    const auth = getAuth()
+    signInWithEmailAndPassword(auth, data.value.email, data.value.password)
+        .then(() => {
+            window.alert("Login success")
+            currentUserStore.setCurrentUser(data.value.email)
+            router.push("/")
+        }).catch(err => {
+            data.value = {
+                email: '',
+                password: ''
+            }
+            errors.value.loginError = true
+        })
 }
 
 </script>

@@ -11,7 +11,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "beyond-blue-webapp": "file:",
     "bootstrap": "^5.3.3",
+    "firebase": "^10.13.2",
     "primevue": "^4.0.5",
     "vue": "^3.4.29"
   },
