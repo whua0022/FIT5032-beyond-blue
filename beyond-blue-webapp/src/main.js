@@ -9,7 +9,8 @@ import RegisterAccView from './pages/RegisterAccView.vue';
 import EventsView from './pages/EventsView.vue';
 import CreateEventView from './pages/CreateEventView.vue';
 import AddRatingView from './pages/AddRatingView.vue';
-
+import Vue3EasyDataTable from 'vue3-easy-data-table';
+import 'vue3-easy-data-table/dist/style.css';
 
 export const routes = [
     {path: "/", component: HomeView},
@@ -28,4 +29,5 @@ export const router = createRouter({
 
 createApp(App)
     .use(router)    
+    .component("EasyDataTable", Vue3EasyDataTable)
     .mount('#app')

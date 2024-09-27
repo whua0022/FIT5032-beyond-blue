@@ -8,3 +8,8 @@ export const formatDate = (dateToFormat) => {
 
     return mm + '/' + dd + '/' + yyyy
 }
+
+export const convertToDate = (timestamp) => {
+    let date = new Date((timestamp.seconds * 1000) + (timestamp.nanoseconds / 1000000))
+    return formatDate(date)
+}
