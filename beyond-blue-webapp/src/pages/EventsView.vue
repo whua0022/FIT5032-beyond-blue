@@ -1,64 +1,65 @@
+<!-- EventsView.vue -->
 <script setup>
-import { onMounted, ref } from 'vue'
-import mapboxgl from 'mapbox-gl'
+import { onMounted, ref } from 'vue';
+import mapboxgl from 'mapbox-gl';
 import EventsList from '@/components/EventsList.vue';
 import db from '../firebase/init';
-import { collection, query, getDocs } from "firebase/firestore";
+import { collection, query, getDocs } from 'firebase/firestore';
 
-// Load the Mapbox API key from environment variables
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY; // Accessing the environment variable
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
 
-// Reactive variable for events list
 const eventsList = ref([]);
 
-// Fetch events from Firestore
 const fetchEvents = async () => {
   try {
-    const querySnapshot = await getDocs(query(collection(db, "events")));
+    const querySnapshot = await getDocs(query(collection(db, 'events')));
     let tempList = [];
     querySnapshot.forEach((event) => {
       tempList.push({ id: event.id, ...event.data() });
     });
-    console.log("Fetched events:", tempList);
+    console.log('Fetched events:', tempList);
     eventsList.value = tempList;
 
     // Add markers after fetching events
     addMarkersToMap();
   } catch (error) {
-    console.error("Error fetching events:", error);
+    console.error('Error fetching events:', error);
   }
 };
 
-// Function to add markers to the map based on event locations
 const addMarkersToMap = () => {
   eventsList.value.forEach((event) => {
-    console.log(event.location)
+    console.log(event.location);
     if (event.location && event.location.lng && event.location.lat) {
-      // Swapping lat and lng if they are reversed
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+        <h5>${event.title}</h5>
+        <p>${event.description || 'No description available'}</p>
+      `);
+
+      // Add marker to map
       new mapboxgl.Marker()
-        .setLngLat([event.location.lat, event.location.lng]) // Correct order
-        .setPopup(new mapboxgl.Popup().setHTML(`<h5>${event.title}</h5><p>${event.description}</p>`))
+        .setLngLat([event.location.lng, event.location.lat]) // lng comes before lat
+        .setPopup(popup) // Add the popup to the marker
         .addTo(map);
     }
   });
 };
-// Map instance variable
+
 let map;
 
-// Initialize the map and fetch events when the component is mounted
 onMounted(() => {
-  // Initialize the map
+  // Initialize the Mapbox map
   map = new mapboxgl.Map({
-    container: 'map', // HTML element id where the map will render
-    style: 'mapbox://styles/mapbox/streets-v11', // Mapbox style
-    center: [144.9631, -37.8136], // Default center coordinates (Melbourne)
-    zoom: 10 // Default zoom level
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: [144.9631, -37.8136], // Melbourne, Australia coordinates
+    zoom: 10,
   });
 
   // Add navigation controls (zoom in/out)
   map.addControl(new mapboxgl.NavigationControl());
 
-  // Fetch events and add markers
+  // Fetch events after the map is initialized
   fetchEvents();
 });
 </script>
@@ -66,16 +67,16 @@ onMounted(() => {
 <template>
   <div class="container-fluid">
     <div class="row">
-      <!-- Event list column -->
+      <!-- Left Column: Events List -->
       <div class="col-md-4">
-        <h1>Events page</h1>
+        <h1>Events Page</h1>
         <div v-if="currentUserStore?.isAdmin" class="mb-3">
-          <RouterLink class="btn btn-success" to="/events/create">Create event</RouterLink>
+          <RouterLink class="btn btn-success" to="/events/create">Create Event</RouterLink>
         </div>
-        <EventsList></EventsList>
+        <EventsList />
       </div>
 
-      <!-- Map column -->
+      <!-- Right Column: Map -->
       <div class="col-md-8">
         <div id="map" class="h-100 border" style="min-height: 500px;"></div>
       </div>
@@ -84,9 +85,8 @@ onMounted(() => {
 </template>
 
 <style>
-/* Set height and width for the map */
 #map {
   width: 100%;
-  height: 100%;
+  height: 500px;
 }
 </style>

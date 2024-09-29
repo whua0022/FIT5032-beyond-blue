@@ -1,26 +1,15 @@
+<!-- EventsList.vue -->
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import db from '../firebase/init';
 import { collection, query, getDocs } from 'firebase/firestore';
-import EasyDataTable from 'vue3-easy-data-table';
-import 'vue3-easy-data-table/dist/style.css';
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle';
 import { convertToDate } from '@/lib';
-// Reactive variable for events list
+
 const items = ref([]);
 
-// Define columns for the DataTable
-const headers = [
-  { value: 'title', text: 'Title'},
-  { value: 'details', text: 'Details'},
-  { value: 'date', text: 'Date', sortable: true },
-  { value: 'address', text: "Address"},
-  { value: 'averageRating', text: 'Average Rating', sortable: true },
-];
-
-// Function to calculate average rating for an event
 const displayAverageRating = (event) => {
-  if (!event.reviews || event.reviews.length === 0) return "No ratings";
+  if (!event.reviews || event.reviews.length === 0) return 'No ratings';
   let score = 0;
   event.reviews.forEach((review) => {
     score += review.rating;
@@ -28,7 +17,6 @@ const displayAverageRating = (event) => {
   return Math.floor(score / event.reviews.length);
 };
 
-// Fetch events from Firestore
 const fetchEvents = async () => {
   try {
     const querySnapshot = await getDocs(query(collection(db, 'events')));
@@ -36,7 +24,14 @@ const fetchEvents = async () => {
     querySnapshot.forEach((eventDoc) => {
       const eventData = eventDoc.data();
       const averageRating = displayAverageRating(eventData);
-      tempList.push({ title: eventData.title, details: eventData.details, date: convertToDate(eventData.date), address: eventData.address, averageRating: averageRating });
+      tempList.push({
+        title: eventData.title,
+        date: convertToDate(eventData.date),
+        averageRating: averageRating,
+        reviews: eventData.reviews,
+        details: eventData.details,
+        address: eventData.address,
+      });
     });
     items.value = tempList;
   } catch (error) {
@@ -44,15 +39,12 @@ const fetchEvents = async () => {
   }
 };
 
-// Fetch events when component is mounted
 onMounted(() => {
   fetchEvents();
 });
 
-// Reactive variable for the selected event to display in the modal
 const selectedEvent = ref(null);
 
-// Show event details in a modal
 const viewDetails = (event) => {
   selectedEvent.value = event;
   const modalElement = document.getElementById('eventModal');
@@ -60,7 +52,6 @@ const viewDetails = (event) => {
   modal.show();
 };
 
-// Hide the modal
 const hideModal = () => {
   const modalElement = document.getElementById('eventModal');
   const modal = bootstrap.Modal.getInstance(modalElement);
@@ -68,16 +59,151 @@ const hideModal = () => {
     modal.hide();
   }
 };
+
+// Sorting
+const sortKey = ref(''); // 'title', 'date', 'averageRating'
+const sortOrder = ref(1); // 1 for ascending, -1 for descending
+
+const selectedSortOption = ref('');
+
+// Update the sortKey based on the selected option
+watch(selectedSortOption, (newVal) => {
+  if (newVal === 'date' || newVal === 'title' || newVal === 'averageRating') {
+    sortKey.value = newVal;
+  } else {
+    sortKey.value = '';
+  }
+});
+
+// Searching
+const searchTitle = ref('');
+
+// Pagination
+const currentPage = ref(1);
+const itemsPerPage = 10;
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredItems.value.length / itemsPerPage);
+});
+
+// Computed property for sorted, searched, and paginated items
+const filteredItems = computed(() => {
+  let tempItems = items.value;
+
+  // Search
+  if (searchTitle.value) {
+    tempItems = tempItems.filter(item =>
+      item.title.toLowerCase().includes(searchTitle.value.toLowerCase())
+    );
+  }
+
+  // Sort
+  if (sortKey.value) {
+    tempItems = tempItems.slice().sort((a, b) => {
+      let valA = a[sortKey.value];
+      let valB = b[sortKey.value];
+
+      if (sortKey.value === 'date') {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      } else if (sortKey.value === 'averageRating') {
+        valA = valA === 'No ratings' ? 0 : valA;
+        valB = valB === 'No ratings' ? 0 : valB;
+      } else if (typeof valA === 'string' && typeof valB === 'string') {
+        valA = valA.toLowerCase();
+        valB = valB.toLowerCase();
+      }
+
+      if (valA < valB) return -1 * sortOrder.value;
+      if (valA > valB) return 1 * sortOrder.value;
+      return 0;
+    });
+  }
+
+  return tempItems;
+});
+
+const paginatedItems = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredItems.value.slice(start, end);
+});
+
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
 </script>
 
 <template>
   <div>
-    <!-- DataTable Component -->
-   <EasyDataTable
-    :headers="headers"
-    :items="items"
-   />
-    
+    <!-- Search Input for Title Column -->
+    <div class="mb-3">
+      <label for="searchTitle" class="form-label">Search by Title:</label>
+      <input type="text" id="searchTitle" v-model="searchTitle" class="form-control" placeholder="Search Title">
+    </div>
+
+    <!-- Sort Dropdown -->
+    <div class="mb-3">
+      <label for="sortOption" class="form-label">Sort by:</label>
+      <select id="sortOption" v-model="selectedSortOption" class="form-select">
+        <option value="">Select</option>
+        <option value="title">Title</option>
+        <option value="date">Date</option>
+        <option value="averageRating">Rating</option>
+      </select>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-responsive">
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Rating</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in paginatedItems" :key="item.title">
+            <td>{{ item.title }}</td>
+            <td>{{ item.date }}</td>
+            <td>{{ item.averageRating }}</td>
+            <td>
+              <button
+                class="btn btn-primary btn-sm"
+                @click="viewDetails(item)"
+              >
+                View
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+          <a class="page-link" href="#" @click.prevent="goToPage(currentPage - 1)">Previous</a>
+        </li>
+        <li
+          v-for="page in totalPages"
+          :key="page"
+          class="page-item"
+          :class="{ active: currentPage === page }"
+        >
+          <a class="page-link" href="#" @click.prevent="goToPage(page)">{{ page }}</a>
+        </li>
+        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+          <a class="page-link" href="#" @click.prevent="goToPage(currentPage + 1)">Next</a>
+        </li>
+      </ul>
+    </nav>
+
     <!-- Modal for event details -->
     <div
       class="modal fade"
@@ -93,9 +219,9 @@ const hideModal = () => {
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p><strong>Description:</strong> {{ selectedEvent?.description }}</p>
+            <p><strong>Description:</strong> {{ selectedEvent?.details }}</p>
             <p><strong>Date:</strong> {{ selectedEvent?.date }}</p>
-            <p><strong>Location:</strong> {{ selectedEvent?.location?.address }}</p>
+            <p><strong>Location:</strong> {{ selectedEvent?.address }}</p>
             <p><strong>Reviews:</strong></p>
             <ul class="list-group">
               <li
