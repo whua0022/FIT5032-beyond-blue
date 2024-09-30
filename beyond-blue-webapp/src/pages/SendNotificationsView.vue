@@ -31,30 +31,33 @@ const openModal = (event) => {
   modal.show();
 };
 
-const sendEmail = async () => {
-  const emailData = {
-    to: 'whua0022@student.monash.edu', // Recipient email
-    emailSubject: emailSubject.value, // Email subject from input
-    emailMessage: emailMessage.value, // Email message from input
-  };
+const sendEmail = async (subscribers) => {
+    for (const email of subscribers) {
+        const emailData = {
+            to: email, // Recipient email
+            emailSubject: emailSubject.value, // Email subject from input
+            emailMessage: emailMessage.value, // Email message from input
+        };
 
-  try {
-    const response = await fetch('/send-email', {
-      method: 'POST', // Make a POST request to the backend
-      headers: {
-        'Content-Type': 'application/json', // Send data in JSON format
-      },
-      body: JSON.stringify(emailData), // Convert emailData object to JSON
-    });
+        try {
+            const response = await fetch('/send-email', {
+            method: 'POST', // Make a POST request to the backend
+            headers: {
+                'Content-Type': 'application/json', // Send data in JSON format
+            },
+            body: JSON.stringify(emailData), // Convert emailData object to JSON
+            });
 
-    if (response.ok) {
-      console.log('Email sent successfully');
-    } else {
-      console.error('Failed to send email');
+            if (response.ok) {
+            console.log('Email sent successfully');
+            } else {
+            console.error('Failed to send email');
+            }
+        } catch (error) {
+            console.error('Error sending email:', error);
+        }
     }
-  } catch (error) {
-    console.error('Error sending email:', error);
-  }
+  
 
   // Close modal after sending
   const modal = bootstrap.Modal.getInstance(document.getElementById('emailModal'));
@@ -102,7 +105,7 @@ onMounted(() => {
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" @click="sendEmail">Send Email</button>
+              <button type="button" class="btn btn-primary" @click="sendEmail(selectedEvent.subscribers)">Send Email</button>
             </div>
           </div>
         </div>
