@@ -24,9 +24,12 @@ import { currentUserStore } from '@/store';
             <li class="nav-item">
                 <RouterLink class="nav-link" to="/">Contact us</RouterLink>
             </li>
+            <li v-if="currentUserStore.isAdmin" class="nav-item">
+                <RouterLink class="nav-link" to="/admin">Admin</RouterLink>
+            </li>
         </ul>
         <div v-if="currentUserStore.email">
-          <p>{{ currentUserStore.email }}</p>
+          <p>{{ currentUserStore.email }} || {{ currentUserStore.isAdmin }}</p>
         </div>
         <div v-else>
           <RouterLink class="nav-link" to="/login">Login</RouterLink>

@@ -10,6 +10,7 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
 
 const eventsList = ref([]);
 
+// Fetch events from Firestore
 const fetchEvents = async () => {
   try {
     const querySnapshot = await getDocs(query(collection(db, 'events')));
@@ -17,50 +18,45 @@ const fetchEvents = async () => {
     querySnapshot.forEach((event) => {
       tempList.push({ id: event.id, ...event.data() });
     });
-    console.log('Fetched events:', tempList);
     eventsList.value = tempList;
 
-    // Add markers after fetching events
+    // After fetching events, add markers to the map
     addMarkersToMap();
   } catch (error) {
     console.error('Error fetching events:', error);
   }
 };
 
+// Add markers to the map
 const addMarkersToMap = () => {
-  eventsList.value.forEach((event) => {
-    console.log(event.location);
-    if (event.location && event.location.lng && event.location.lat) {
-      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-        <h5>${event.title}</h5>
-        <p>${event.description || 'No description available'}</p>
-      `);
+  for (const event of eventsList.value) {
+  if (event.location && event.location.lng && event.location.lat) {
+    const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+      <h5>${event.title}</h5>
+      <p>${event.details || 'No description available'}</p>
+    `);
 
-      // Add marker to map
-      new mapboxgl.Marker()
-        .setLngLat([event.location.lng, event.location.lat]) // lng comes before lat
-        .setPopup(popup) // Add the popup to the marker
-        .addTo(map);
-    }
-  });
+    new mapboxgl.Marker()
+      .setLngLat([event.location.lng, event.location.lat]) 
+      .setPopup(popup)
+      .addTo(map)
+  }
+}
+
 };
 
 let map;
 
 onMounted(() => {
-  // Initialize the Mapbox map
   map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v11',
-    center: [144.9631, -37.8136], // Melbourne, Australia coordinates
+    center: [144.9631, -37.8136],
     zoom: 10,
   });
 
-  // Add navigation controls (zoom in/out)
   map.addControl(new mapboxgl.NavigationControl());
-
-  // Fetch events after the map is initialized
-  fetchEvents();
+  fetchEvents()
 });
 </script>
 

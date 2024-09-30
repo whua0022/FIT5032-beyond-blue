@@ -26,9 +26,10 @@ const login = () => {
                 password: ''
             }
             errors.value.loginError = true
+        }).then(() => {
+            currentUserStore.validateRole()
         })
 }
-
 </script>
 <template>
     <div>

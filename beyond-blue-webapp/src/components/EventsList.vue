@@ -223,19 +223,27 @@ const goToPage = (page) => {
             <p><strong>Date:</strong> {{ selectedEvent?.date }}</p>
             <p><strong>Location:</strong> {{ selectedEvent?.address }}</p>
             <p><strong>Reviews:</strong></p>
-            <ul class="list-group">
-              <li
-                v-for="review in selectedEvent?.reviews"
-                :key="review.username"
-                class="list-group-item mb-2"
-              >
-                <div class="d-flex justify-content-between align-items-center">
-                  <strong>{{ review.username }}</strong>
-                  <span class="badge bg-primary rounded-pill">{{ review.rating }}/5</span>
-                </div>
-                <p class="mb-1">{{ review.review }}</p>
-              </li>
-            </ul>
+                      <!-- Data Table -->
+              <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Date</th>
+                      <th>Rating</th>
+                      <th>Comment</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="review in selectedEvent?.reviews" :key="review.title">
+                      <td>{{ review.username }}</td>
+                      <td>{{ convertToDate(review.date) }}</td>
+                      <td>{{ review.rating }}</td>
+                      <td>{{ review.comment }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" @click="hideModal">Close</button>
