@@ -1,68 +1,71 @@
 <script setup>
-import { ref } from 'vue';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import db from '@/firebase/init';
-import { getAuth } from 'firebase/auth';
-import { convertToDate } from '@/lib';
+import { ref } from 'vue'
+import { collection, query, where, getDocs } from 'firebase/firestore'
+import db from '@/firebase/init'
+import { getAuth } from 'firebase/auth'
+import { convertToDate } from '@/lib'
 
-// Store for user's events
-const userEvents = ref([]);
+const userEvents = ref([])
 
-const auth = getAuth();
+const auth = getAuth()
 
-// Function to fetch all events owned by the current user and export them as CSV
 const exportToCSV = async () => {
   try {
-    // Fetch the user's events
-    const q = query(collection(db, "events"), where("creatorId", "==", auth.currentUser.uid));
-    const querySnapshot = await getDocs(q);
+    const events = await getDocs(query(collection(db, "events"), where("creatorId", "==", auth.currentUser.uid)))
 
-    userEvents.value = querySnapshot.docs.map(doc => ({
+    userEvents.value = events.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-    }));
+    }))
 
-    if (userEvents.value.length === 0) {
-      alert("No events found to export.");
-      return;
+    if (userEvents.value.length == 0) {
+      alert("No events found to export.")
+      return
     }
 
-    // Prepare CSV content
-    const csvRows = [];
-    const headers = ["Title", "Address", "Date", "Details", "Subscribers", "Reviews"]; // Add headers for the CSV
-    csvRows.push(headers.join(",")); // Add the headers row
+    let csvRows = []
+    const headers = ["Title", "Address", "Date", "Details", "Subscribers", "Reviews"]
+    csvRows.push(headers.join(","))
 
     userEvents.value.forEach(event => {
-      const { title, address, date, details, subscribers, reviews } = event;
-      const subscribersList = subscribers.join(";");
-      const reviewsList = reviews.map(review => `${review.username}: ${review.comment}`).join("; ");
+      const { title, address, date, details, subscribers, reviews } = event
+      const subscribersList = subscribers.join(";")
+      const reviewsList = reviews.map(review => `${review.username}: ${review.comment}`).join("; ")
 
-      const row = [title, address, convertToDate(date), details, subscribersList, reviewsList];
-      csvRows.push(row.join(","));
-    });
+      const row = [title, address, convertToDate(date), details, subscribersList, reviewsList]
+      csvRows.push(row.join(","))
+    })
 
-    // Convert rows into a CSV file
-    const csvContent = `data:text/csv;charset=utf-8,${csvRows.join("\n")}`;
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "user_events.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const csvContent = `data:text/csv;charset=utf-8,${csvRows.join("\n")}`
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement("a")
+    link.setAttribute("href", encodedUri)
+    link.setAttribute("download", "user_events.csv")
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   } catch (error) {
-    console.error("Error fetching user events or exporting to CSV: ", error);
+    console.error("Error exporting to CSV: ", error)
   }
-};
+}
 </script>
 
 <template>
-  <div>
-    <h1>Admin Page</h1>
-    <RouterLink class="btn btn-primary" to="/events/create">Create Event</RouterLink>
-    <RouterLink class="btn btn-primary" to="/events/notifications">Send Notifications</RouterLink>
-    
-    <!-- Button to export user's events to CSV -->
-    <button class="btn btn-warning mt-3" @click="exportToCSV">Export My Events as CSV</button>
+  <div class="container mt-5">
+    <h1 class="mb-4 text-center">Admin Page</h1>
+    <div class="row justify-content-center">
+      <div class="col-md-6 d-grid gap-3">
+        <RouterLink class="btn btn-primary" to="/events/create">Create Event</RouterLink>
+        <RouterLink class="btn btn-primary" to="/events/notifications">Send Notifications</RouterLink>
+        <RouterLink class="btn btn-primary" to="/events/manage">Manage My Events</RouterLink>
+        <button class="btn btn-warning mt-3" @click="exportToCSV">Export My Events as CSV</button>
+      </div>
+    </div>
   </div>
 </template>
+
+<style scoped>
+  .container {
+    max-width: 600px;
+  }
+</style>

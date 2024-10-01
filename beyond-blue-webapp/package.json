@@ -16,6 +16,7 @@
     "axios": "^1.7.7",
     "beyond-blue-webapp": "file:",
     "bootstrap": "^5.3.3",
+    "chart.js": "^4.4.4",
     "firebase": "^10.13.2",
     "mapbox-gl": "^3.7.0",
     "openai": "^4.66.1",

@@ -13,6 +13,7 @@ import Vue3EasyDataTable from 'vue3-easy-data-table';
 import 'vue3-easy-data-table/dist/style.css';
 import AdminView from './pages/AdminView.vue';
 import SendNotificationsView from './pages/SendNotificationsView.vue';
+import ManageEventsView from './pages/ManageEventsView.vue';
 
 export const routes = [
     {path: "/", component: HomeView},
@@ -22,7 +23,8 @@ export const routes = [
     {path: "/events/create", component: CreateEventView},
     {path: "/events/rate", name: "AddRatingView", component: AddRatingView},
     {path: "/admin", component: AdminView},
-    {path: "/events/notifications", component: SendNotificationsView}
+    {path: "/events/notifications", component: SendNotificationsView},
+    {path: "/events/manage", component: ManageEventsView},
 ]
 
 export const router = createRouter({
