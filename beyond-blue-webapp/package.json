@@ -11,11 +11,14 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@mapbox/mapbox-gl-directions": "^4.3.1",
     "@sendgrid/mail": "^8.1.3",
+    "axios": "^1.7.7",
     "beyond-blue-webapp": "file:",
     "bootstrap": "^5.3.3",
     "firebase": "^10.13.2",
     "mapbox-gl": "^3.7.0",
+    "openai": "^4.66.1",
     "primevue": "^4.0.5",
     "vue": "^3.4.29",
     "vue3-easy-data-table": "^1.5.47"
