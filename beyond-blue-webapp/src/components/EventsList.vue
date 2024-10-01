@@ -107,7 +107,7 @@ const filteredItems = computed(() => {
 })
 
 const paginatedItems = computed(() => {
-  return filteredItems.value.slice((currentPage.value - 1) * itemsPerPage, start + itemsPerPage)
+  return filteredItems.value.slice((currentPage.value - 1) * itemsPerPage, ((currentPage.value - 1) * itemsPerPage) + itemsPerPage)
 })
 
 const goToPage = (page) => {
@@ -175,7 +175,7 @@ const goToPage = (page) => {
         >
           <a class="page-link" href="#" @click.prevent="goToPage(page)">{{ page }}</a>
         </li>
-        <li class="page-item" :class="{ disabled: currentPage=== totalPages }">
+        <li class="page-item" :class="{ disabled: currentPage == totalPages }">
           <a class="page-link" href="#" @click.prevent="goToPage(currentPage + 1)">Next</a>
         </li>
       </ul>
