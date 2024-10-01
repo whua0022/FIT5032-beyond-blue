@@ -23,6 +23,7 @@
     "openai": "^4.66.1",
     "primevue": "^4.0.5",
     "vue": "^3.4.29",
+    "vue-router": "^4.0.13",
     "vue3-easy-data-table": "^1.5.47"
   },
   "devDependencies": {
